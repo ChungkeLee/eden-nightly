@@ -22,7 +22,7 @@ ln -sfv ./eden.svg ./.DirIcon
 
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./sharun-aio
 chmod +x ./sharun-aio
-xvfb-run -a ./sharun-aio l -p -v -e -s -k \
+xvfb-run -a ./sharun-aio l -p -v -s -k \
     /usr/bin/eden \
     /usr/lib/lib*GL*.so* \
     /usr/lib/dri/* \
