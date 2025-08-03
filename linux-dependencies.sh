@@ -6,7 +6,6 @@ ARCH="$(uname -m)"
 echo "Installing build dependencies..."
 echo "---------------------------------------------------------------"
 pacman -Syu --noconfirm \
-	aom \
 	base-devel \
 	boost \
 	boost-libs \
@@ -15,18 +14,13 @@ pacman -Syu --noconfirm \
 	cmake \
  	ccache \
 	curl \
-	dav1d \
-	desktop-file-utils \
-	doxygen \
 	enet \
 	fuse2 \
 	fmt \
 	gamemode \
 	git \
 	glslang \
-	glfw \
-	glu \
-	hidapi \
+ 	inetutils \
  	jq \
 	libass \
 	libdecor \
@@ -43,11 +37,9 @@ pacman -Syu --noconfirm \
 	mbedtls \
 	mbedtls2 \
 	mesa \
-	meson \
 	nasm \
 	ninja \
 	nlohmann-json \
-	numactl \
 	patchelf \
 	pipewire-audio \
 	pulseaudio \
@@ -61,7 +53,6 @@ pacman -Syu --noconfirm \
  	qt6-5compat \
  	rapidjson \
   	sccache \
-	sdl2 \
  	sdl3 \
 	strace \
 	unzip \
