@@ -48,6 +48,7 @@ mkdir -p build
 cd build
 cmake .. -G Ninja \
     -DYUZU_TESTS=OFF \
+	-DBUILD_TESTING=OFF \
     -DYUZU_USE_BUNDLED_QT=OFF \
     -DENABLE_QT_TRANSLATION=ON \
     -DYUZU_ENABLE_LTO=ON \
