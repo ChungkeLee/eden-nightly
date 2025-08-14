@@ -46,7 +46,12 @@ EXE_NAME="Eden-${COUNT}-Windows-${ARCH}"
 
 mkdir -p build
 cd build
+
+# 设置针对您CPU的优化参数
+export CMAKE_CXX_FLAGS="/arch:AVX2"
+
 cmake .. -G Ninja \
+    -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS}" \
     -DYUZU_TESTS=OFF \
 	-DBUILD_TESTING=OFF \
     -DYUZU_USE_BUNDLED_QT=OFF \
