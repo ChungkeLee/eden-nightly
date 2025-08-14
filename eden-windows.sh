@@ -52,7 +52,7 @@ mkdir -p build
 cd build
 cmake .. -G Ninja \
     -DYUZU_TESTS=OFF \
-    -DYUZU_ENABLE_DEBUGGER=OFF \ # <--- 핵심 수정 사항: 디버거 기능을 꺼서 Boost.Process 의존성을 제거합니다.
+    -DYUZU_ENABLE_DEBUGGER=OFF \
     -DYUZU_USE_BUNDLED_QT=OFF \
     -DENABLE_QT_TRANSLATION=ON \
     -DYUZU_ENABLE_LTO=ON \
