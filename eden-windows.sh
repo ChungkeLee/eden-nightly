@@ -4,18 +4,18 @@ echo "Making Eden for Windows (MSVC)"
 
 cd ./eden
 
-# Initialize an array for extra CMake arguments
+# 初始化一个用于存放额外CMake参数的数组
 declare -a EXTRA_CMAKE_FLAGS=()
 
 if [[ "${ARCH}" == "ARM64" ]]; then
-    # Add specific build parameters for the ARM64 architecture
+    # 为ARM64架构添加特定的编译参数
     EXTRA_CMAKE_FLAGS+=(
         -DYUZU_USE_BUNDLED_SDL2=OFF
         -DYUZU_USE_EXTERNAL_SDL2=ON
         -DCMAKE_SYSTEM_NAME=Windows
     )
 
-    # ... (rest of the ARM64 specific sed commands)
+    # ... (ARM64 specific sed commands)
     sed -i 's|set(package_base_url "https://github.com/eden-emulator/")|set(package_base_url "https://github.com/pflyly/eden-nightly/")|' CMakeModules/DownloadExternals.cmake
     sed -i 's|set(package_repo "ext-windows-bin/raw/master/")|set(package_repo "raw/refs/heads/main/")|' CMakeModules/DownloadExternals.cmake
     sed -i 's|set(package_extension ".7z")|set(package_extension ".zip")|' CMakeModules/DownloadExternals.cmake
@@ -37,7 +37,7 @@ if [[ "${ARCH}" == "ARM64" ]]; then
     sed -i '/#include <boost\/asio.hpp>/a #include <boost/version.hpp>' src/core/debugger/debugger.cpp
 
 elif [[ "${ARCH}" == "x86_64" ]]; then
-    # Enable targeted CPU optimization (AVX2) for your x86_64 architecture
+    # 为您的 x86_64 架构开启针对性的CPU优化 (AVX2), 大幅提升程序性能
     echo "Enabling AVX2 optimizations for native x86_64 performance."
     EXTRA_CMAKE_FLAGS+=("-DCMAKE_CXX_FLAGS=/arch:AVX2")
 fi
@@ -51,8 +51,9 @@ EXE_NAME="Eden-${COUNT}-Windows-${ARCH}"
 mkdir -p build
 cd build
 cmake .. -G Ninja \
+    -DBUILD_TESTING=OFF \         # <--- 核心修复 1: 禁用所有组件的测试, 解决Catch2缺失问题
+    -DYUZU_ENABLE_DEBUGGER=OFF \  # <--- 核心修复 2: 禁用调试器, 解决Boost.Process缺失问题
     -DYUZU_TESTS=OFF \
-    -DYUZU_ENABLE_DEBUGGER=OFF \
     -DYUZU_USE_BUNDLED_QT=OFF \
     -DENABLE_QT_TRANSLATION=ON \
     -DYUZU_ENABLE_LTO=ON \
@@ -82,7 +83,7 @@ else
     windeployqt6 --release --no-compiler-runtime --no-opengl-sw --no-system-dxc-compiler --no-system-d3d-compiler --dir bin "$EXE_PATH"
 fi
 
-# Delete un-needed debug files 
+# Delete un-needed debug files
 find bin -type f -name "*.pdb" -exec rm -fv {} +
 
 # Pack for upload
