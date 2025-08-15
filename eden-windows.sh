@@ -37,9 +37,10 @@ if [[ "${ARCH}" == "ARM64" ]]; then
     sed -i '/#include <boost\/asio.hpp>/a #include <boost/version.hpp>' src/core/debugger/debugger.cpp
 
 elif [[ "${ARCH}" == "x86_64" ]]; then
-    # 为 x86_64 架构开启针对性的CPU优化 (AVX2)
-    echo "Enabling AVX2 optimizations for native x86_64 performance."
-    EXTRA_CMAKE_FLAGS+=("-DCMAKE_CXX_FLAGS=/arch:AVX2")
+    # 为 x86_64 架构开启针对性的CPU优化 (AVX2) 和 C++异常处理 (/EHsc)
+    echo "Enabling AVX2 optimizations and C++ exception handling for native x86_64 performance."
+    # <--- 本次核心修复：在编译参数中加入 /EHsc --->
+    EXTRA_CMAKE_FLAGS+=("-DCMAKE_CXX_FLAGS=/arch:AVX2 /EHsc")
 fi
 
 # 禁用调试信息和部分警告
@@ -51,7 +52,6 @@ EXE_NAME="Eden-${COUNT}-Windows-${ARCH}"
 mkdir -p build
 cd build
 
-# 下方的 cmake 命令块中，每一行末尾的反斜杠(\)都已确认无误
 cmake .. -G Ninja \
     -DBUILD_TESTING=OFF \
     -DYUZU_ENABLE_DEBUGGER=OFF \
