@@ -4,7 +4,7 @@ echo "Making Eden for Windows (MSVC)"
 
 cd ./eden
 
-# 初始化一个用于存放额外CMake参数的数组
+# 为额外的CMake参数初始化一个数组
 declare -a EXTRA_CMAKE_FLAGS=()
 
 if [[ "${ARCH}" == "ARM64" ]]; then
@@ -15,7 +15,7 @@ if [[ "${ARCH}" == "ARM64" ]]; then
         -DCMAKE_SYSTEM_NAME=Windows
     )
 
-    # ... (ARM64 specific sed commands)
+    # ... (适用于ARM64的sed命令)
     sed -i 's|set(package_base_url "https://github.com/eden-emulator/")|set(package_base_url "https://github.com/pflyly/eden-nightly/")|' CMakeModules/DownloadExternals.cmake
     sed -i 's|set(package_repo "ext-windows-bin/raw/master/")|set(package_repo "raw/refs/heads/main/")|' CMakeModules/DownloadExternals.cmake
     sed -i 's|set(package_extension ".7z")|set(package_extension ".zip")|' CMakeModules/DownloadExternals.cmake
@@ -37,12 +37,12 @@ if [[ "${ARCH}" == "ARM64" ]]; then
     sed -i '/#include <boost\/asio.hpp>/a #include <boost/version.hpp>' src/core/debugger/debugger.cpp
 
 elif [[ "${ARCH}" == "x86_64" ]]; then
-    # 为您的 x86_64 架构开启针对性的CPU优化 (AVX2), 大幅提升程序性能
+    # 为 x86_64 架构开启针对性的CPU优化 (AVX2)
     echo "Enabling AVX2 optimizations for native x86_64 performance."
     EXTRA_CMAKE_FLAGS+=("-DCMAKE_CXX_FLAGS=/arch:AVX2")
 fi
 
-# disable debug info and silence warnings. turns out this can reduce build time, so we keep it.
+# 禁用调试信息和部分警告
 find . -name CMakeLists.txt -exec sed -i 's|/W4||g; s|/Zi||g; s|/Zo||g; s|  *| |g' {} +
 
 COUNT="$(git rev-list --count HEAD)"
@@ -50,9 +50,11 @@ EXE_NAME="Eden-${COUNT}-Windows-${ARCH}"
 
 mkdir -p build
 cd build
+
+# 下方的 cmake 命令块中，每一行末尾的反斜杠(\)都已确认无误
 cmake .. -G Ninja \
-    -DBUILD_TESTING=OFF \         # <--- 核心修复 1: 禁用所有组件的测试, 解决Catch2缺失问题
-    -DYUZU_ENABLE_DEBUGGER=OFF \  # <--- 核心修复 2: 禁用调试器, 解决Boost.Process缺失问题
+    -DBUILD_TESTING=OFF \
+    -DYUZU_ENABLE_DEBUGGER=OFF \
     -DYUZU_TESTS=OFF \
     -DYUZU_USE_BUNDLED_QT=OFF \
     -DENABLE_QT_TRANSLATION=ON \
@@ -65,10 +67,11 @@ cmake .. -G Ninja \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
     "${EXTRA_CMAKE_FLAGS[@]}"
+
 ninja
 ccache -s -v
 
-# Use windeployqt to gather dependencies
+# 使用 windeployqt 来收集依赖项
 EXE_PATH=./bin/eden.exe
 
 if [[ "${ARCH}" == "ARM64" ]]; then
@@ -83,10 +86,10 @@ else
     windeployqt6 --release --no-compiler-runtime --no-opengl-sw --no-system-dxc-compiler --no-system-d3d-compiler --dir bin "$EXE_PATH"
 fi
 
-# Delete un-needed debug files
+# 删除不需要的调试文件
 find bin -type f -name "*.pdb" -exec rm -fv {} +
 
-# Pack for upload
+# 打包用于上传
 mkdir -p artifacts
 mkdir "$EXE_NAME"
 cp -r bin/* "$EXE_NAME"
